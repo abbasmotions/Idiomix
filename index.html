@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Idiom Mastery Hub | Interactive Learning Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Custom Styles for Flashcard Flip */
+      .perspective-1000 {
+        perspective: 1000px;
+      }
+      .transform-style-3d {
+        transform-style: preserve-3d;
+      }
+      .backface-hidden {
+        backface-visibility: hidden;
+      }
+      .rotate-y-180 {
+        transform: rotateY(180deg);
+      }
+
+      /* Smooth transitions */
+      .card-transition {
+        transition: transform 0.6s;
+      }
+
+      /* Chart Container sizing */
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 300px;
+        max-height: 400px;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #fdfbf7; /* Warm neutral background */
+        color: #2d3748;
+      }
+
+      .serif-font {
+        font-family: "Merriweather", serif;
+      }
+
+      /* Custom scrollbar for lists */
+      .custom-scroll::-webkit-scrollbar {
+        width: 8px;
+      }
+      .custom-scroll::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      .custom-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 4px;
+      }
+      .custom-scroll::-webkit-scrollbar-thumb:hover {
+        background: #a0aec0;
+      }
+    </style>
+  </head>
+  <body class="bg-[#FDFBF7] min-h-screen flex flex-col">
+    <!-- placeholders -->
+    <!-- Chosen Palette: Warm Neutrals (Cream #FDFBF7, Slate #2D3748, Muted Gold #D69E2E, Sage Green #68D391) for a focused, academic atmosphere. -->
+
+    <!-- Application Structure Plan: 
+         1. Dashboard: High-level overview, "Word of the Day", and Corpus Analysis (Data visualization of the idiom structure).
+         2. Dictionary: Searchable, filterable list of all content for quick reference.
+         3. Study Deck: Interactive Flashcards for memorization (Active Recall).
+         4. Challenge Mode: Quiz system to test knowledge with real-time scoring visualization.
+         Why: This structure moves from passive observation (Dashboard) to active searching (Dictionary) to deep learning (Deck) to testing (Challenge), mirroring the natural learning lifecycle.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Corpus Analysis Bar Chart: Visualizes the most common starting words (e.g., "Get", "Take", "On") to reveal linguistic patterns in English idioms. Library: Chart.js.
+         2. Quiz Performance Doughnut Chart: Provides immediate feedback on user's session accuracy. Library: Chart.js.
+         3. Flashcards: HTML/CSS 3D transforms for interaction. No SVGs used.
+         4. Logic: Vanilla JS for all state management, randomizer algorithms, and search filtering.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <span
+              class="text-2xl font-bold text-gray-800 tracking-tight serif-font"
+              >Idiom<span class="text-[#D69E2E]">Hub</span></span
+            >
+          </div>
+          <div class="flex space-x-8 items-center hidden md:flex">
+            <button
+              onclick="switchTab('dashboard')"
+              class="nav-btn text-gray-900 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-[#D69E2E]"
+              id="btn-dashboard"
+            >
+              Dashboard
+            </button>
+            <button
+              onclick="switchTab('dictionary')"
+              class="nav-btn text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              id="btn-dictionary"
+            >
+              Dictionary
+            </button>
+            <button
+              onclick="switchTab('study')"
+              class="nav-btn text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              id="btn-study"
+            >
+              Study Deck
+            </button>
+            <button
+              onclick="switchTab('quiz')"
+              class="nav-btn text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              id="btn-quiz"
+            >
+              Challenge
+            </button>
+          </div>
+          <!-- Mobile menu button stub -->
+          <div class="flex items-center md:hidden">
+            <button
+              onclick="toggleMobileMenu()"
+              class="text-gray-500 hover:text-gray-900 focus:outline-none"
+            >
+              Menu ☰
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Mobile Menu -->
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-white border-t border-gray-100"
+      >
+        <button
+          onclick="switchTab('dashboard')"
+          class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+        >
+          Dashboard
+        </button>
+        <button
+          onclick="switchTab('dictionary')"
+          class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+        >
+          Dictionary
+        </button>
+        <button
+          onclick="switchTab('study')"
+          class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+        >
+          Study Deck
+        </button>
+        <button
+          onclick="switchTab('quiz')"
+          class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+        >
+          Challenge
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+      <!-- SECTION: DASHBOARD -->
+      <section id="dashboard" class="space-y-8 animate-fade-in">
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">
+            Welcome to Your Lexicon Lounge
+          </h1>
+          <p class="text-gray-600 max-w-3xl">
+            Explore, analyze, and master 194 essential English idioms. This
+            interactive hub breaks down the corpus into consumable insights.
+            Below, you'll find a daily highlight and a linguistic breakdown of
+            the most common starting verbs in the collection.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Random Idiom Card -->
+          <div
+            class="bg-[#2D3748] rounded-xl shadow-lg p-8 text-white flex flex-col justify-center relative overflow-hidden"
+          >
+            <div
+              class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 rounded-full bg-[#D69E2E] opacity-20"
+            ></div>
+            <div class="relative z-10">
+              <span
+                class="uppercase tracking-widest text-xs font-semibold text-[#D69E2E] mb-2 block"
+                >Idiom of the Moment</span
+              >
+              <h2
+                id="hero-idiom"
+                class="text-3xl md:text-4xl font-bold serif-font mb-4"
+              >
+                --
+              </h2>
+              <p id="hero-meaning" class="text-gray-300 text-lg mb-6 italic">
+                --
+              </p>
+              <div
+                class="bg-white/10 rounded-lg p-4 backdrop-blur-sm border border-white/10"
+              >
+                <span class="text-xs text-gray-400 uppercase font-bold"
+                  >Example Usage</span
+                >
+                <p id="hero-example" class="text-white mt-1">--</p>
+              </div>
+              <button
+                onclick="loadRandomHero()"
+                class="mt-6 text-sm text-[#D69E2E] hover:text-white transition-colors self-start font-semibold"
+              >
+                ↻ Refresh Selection
+              </button>
+            </div>
+          </div>
+
+          <!-- Corpus Analysis Chart -->
+          <div
+            class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col"
+          >
+            <div class="mb-4">
+              <h3 class="text-lg font-bold text-gray-900">Corpus Analysis</h3>
+              <p class="text-sm text-gray-500">
+                Frequency of starting words across all 194 idioms.
+              </p>
+            </div>
+            <div
+              class="flex-grow flex items-center justify-center bg-gray-50 rounded-lg p-2"
+            >
+              <div class="chart-container">
+                <canvas id="corpusChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div
+            class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center"
+          >
+            <span class="block text-3xl font-bold text-gray-800" id="stat-total"
+              >194</span
+            >
+            <span class="text-xs text-gray-500 uppercase tracking-wide"
+              >Total Idioms</span
+            >
+          </div>
+          <div
+            class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center"
+          >
+            <span
+              class="block text-3xl font-bold text-indigo-600"
+              id="stat-studied"
+              >0</span
+            >
+            <span class="text-xs text-gray-500 uppercase tracking-wide"
+              >Cards Flipped</span
+            >
+          </div>
+          <div
+            class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center"
+          >
+            <span
+              class="block text-3xl font-bold text-green-600"
+              id="stat-correct"
+              >0</span
+            >
+            <span class="text-xs text-gray-500 uppercase tracking-wide"
+              >Quiz Correct</span
+            >
+          </div>
+          <div
+            class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center"
+          >
+            <span class="block text-3xl font-bold text-[#D69E2E]" id="stat-avg"
+              >0%</span
+            >
+            <span class="text-xs text-gray-500 uppercase tracking-wide"
+              >Accuracy</span
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: DICTIONARY -->
+      <section id="dictionary" class="hidden space-y-6">
+        <div
+          class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4"
+        >
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">Idiom Directory</h2>
+            <p class="text-gray-600 text-sm mt-1">
+              Search the complete database. Type any keyword to filter by phrase
+              or meaning.
+            </p>
+          </div>
+          <div class="w-full md:w-1/3">
+            <input
+              type="text"
+              id="searchInput"
+              onkeyup="filterDictionary()"
+              placeholder="Search idioms (e.g., 'time', 'money')..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D69E2E] focus:border-transparent outline-none transition-shadow"
+            />
+          </div>
+        </div>
+
+        <div
+          class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+        >
+          <div class="overflow-y-auto custom-scroll h-[70vh]">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50 sticky top-0 z-10">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4"
+                  >
+                    Idiom
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3"
+                  >
+                    Meaning
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Example & Contrast
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                class="bg-white divide-y divide-gray-200"
+                id="dictionaryBody"
+              >
+                <!-- JS Populated -->
+              </tbody>
+            </table>
+            <div id="noResults" class="hidden p-8 text-center text-gray-500">
+              No idioms found matching your search.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: STUDY DECK -->
+      <section
+        id="study"
+        class="hidden h-full flex flex-col items-center justify-center space-y-8"
+      >
+        <div class="text-center max-w-2xl">
+          <h2 class="text-2xl font-bold text-gray-900">Flashcard Deck</h2>
+          <p class="text-gray-600 mt-2">
+            Test your active recall. Click the card to flip it and reveal the
+            meaning. Use the buttons to navigate the deck.
+          </p>
+        </div>
+
+        <!-- Flashcard Container -->
+        <div
+          class="perspective-1000 w-full max-w-xl h-80 cursor-pointer group"
+          onclick="flipCard()"
+        >
+          <div
+            id="flashcard-inner"
+            class="relative w-full h-full text-center transition-transform duration-500 transform-style-3d shadow-xl rounded-2xl"
+          >
+            <!-- Front -->
+            <div
+              class="absolute w-full h-full bg-white rounded-2xl backface-hidden flex flex-col items-center justify-center p-8 border-2 border-gray-100"
+            >
+              <span
+                class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4"
+                >Idiom</span
+              >
+              <h3
+                id="card-front-text"
+                class="text-3xl md:text-4xl font-bold text-gray-800 serif-font"
+              >
+                --
+              </h3>
+              <p class="mt-8 text-sm text-gray-400 font-medium animate-pulse">
+                Click to Reveal Definition
+              </p>
+            </div>
+
+            <!-- Back -->
+            <div
+              class="absolute w-full h-full bg-[#2D3748] rounded-2xl backface-hidden rotate-y-180 flex flex-col items-center justify-center p-8 text-white"
+            >
+              <span
+                class="text-xs font-bold text-[#D69E2E] uppercase tracking-widest mb-2"
+                >Meaning</span
+              >
+              <p
+                id="card-back-meaning"
+                class="text-lg md:text-xl font-medium leading-relaxed"
+              >
+                --
+              </p>
+
+              <div class="mt-6 w-full text-left bg-white/10 rounded p-3">
+                <span class="text-xs text-gray-400 uppercase block mb-1"
+                  >Context</span
+                >
+                <p id="card-back-example" class="text-sm text-gray-200 italic">
+                  --
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center space-x-6">
+          <button
+            onclick="prevCard()"
+            class="p-3 rounded-full bg-white border border-gray-200 hover:bg-gray-50 shadow-sm transition-colors text-gray-600 hover:text-[#D69E2E]"
+          >
+            <span class="text-xl">←</span>
+          </button>
+          <div class="text-gray-500 font-mono text-sm">
+            Card <span id="card-counter">1</span> /
+            <span id="total-cards">194</span>
+          </div>
+          <button
+            onclick="nextCard()"
+            class="p-3 rounded-full bg-white border border-gray-200 hover:bg-gray-50 shadow-sm transition-colors text-gray-600 hover:text-[#D69E2E]"
+          >
+            <span class="text-xl">→</span>
+          </button>
+        </div>
+
+        <button
+          onclick="shuffleDeck()"
+          class="text-xs text-gray-500 underline hover:text-gray-800"
+        >
+          Shuffle Deck
+        </button>
+      </section>
+
+      <!-- SECTION: CHALLENGE (QUIZ) -->
+      <section id="quiz" class="hidden space-y-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">
+          <!-- Quiz Interface -->
+          <div
+            class="lg:col-span-2 bg-white rounded-xl shadow-lg border border-gray-100 p-8 flex flex-col"
+          >
+            <div class="mb-6 flex justify-between items-center">
+              <div>
+                <h2 class="text-xl font-bold text-gray-900">Knowledge Check</h2>
+                <p class="text-gray-500 text-sm">
+                  Select the correct idiom for the given definition.
+                </p>
+              </div>
+              <span
+                id="quiz-streak"
+                class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold"
+                >Streak: 0</span
+              >
+            </div>
+
+            <div
+              id="quiz-question-container"
+              class="flex-grow flex flex-col justify-center"
+            >
+              <div class="mb-8">
+                <span
+                  class="text-xs font-bold text-gray-400 uppercase tracking-wide"
+                  >Definition</span
+                >
+                <p
+                  id="quiz-question"
+                  class="text-2xl font-medium text-gray-800 mt-2 leading-relaxed serif-font"
+                >
+                  --
+                </p>
+                <p
+                  id="quiz-hint"
+                  class="mt-4 text-sm text-gray-500 italic hidden"
+                >
+                  Hint: Starts with 'H'...
+                </p>
+              </div>
+
+              <div id="quiz-options" class="grid grid-cols-1 gap-3">
+                <!-- Options generated by JS -->
+              </div>
+
+              <div
+                id="quiz-feedback"
+                class="hidden mt-4 p-4 rounded-lg text-center font-bold"
+              ></div>
+            </div>
+
+            <div
+              class="mt-6 flex justify-between items-center pt-6 border-t border-gray-100"
+            >
+              <button
+                onclick="generateQuiz()"
+                class="text-sm text-gray-500 hover:text-gray-900"
+              >
+                Skip Question
+              </button>
+              <button
+                onclick="nextQuestion()"
+                id="btn-next-q"
+                class="bg-[#2D3748] text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+              >
+                Next Question
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats Panel -->
+          <div
+            class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col"
+          >
+            <h3 class="text-lg font-bold text-gray-900 mb-4">
+              Session Performance
+            </h3>
+            <div class="flex-grow flex items-center justify-center">
+              <div class="chart-container" style="height: 250px">
+                <canvas id="quizChart"></canvas>
+              </div>
+            </div>
+            <div class="mt-4 text-center">
+              <p class="text-sm text-gray-500">
+                Keep practicing to improve your accuracy score.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 py-6 mt-auto">
+      <div class="max-w-7xl mx-auto px-4 text-center">
+        <p class="text-gray-400 text-sm">
+          &copy; 2024 Idiom Mastery Hub. Generated from Source Report.
+        </p>
+      </div>
+    </footer>
+
+    <!-- LOGIC -->
+    <script>
+      // --- DATA STORAGE ---
+      // Manually parsed from the source text provided in the prompt.
+      const idiomsData = [
+        {
+          id: 1,
+          phrase: "HIT THE SACK",
+          meaning: "Go to bed in order to rest or sleep after feeling tired.",
+          example: "I’m exhausted, so I’ll hit the sack early tonight.",
+          contrast: "He stayed up late and didn’t hit the sack.",
+        },
+        {
+          id: 2,
+          phrase: "SLEEP ON IT",
+          meaning:
+            "Delay making a decision to allow time for careful thinking.",
+          example: "I’ll sleep on it and give you an answer tomorrow.",
+          contrast: "She decided immediately and didn’t sleep on it.",
+        },
+        {
+          id: 3,
+          phrase: "BREAK THE ICE",
+          meaning:
+            "Do or say something to reduce tension and make people feel comfortable.",
+          example: "He told a joke to break the ice at the meeting.",
+          contrast: "The room stayed awkward and silent.",
+        },
+        {
+          id: 4,
+          phrase: "CALL IT A DAY",
+          meaning:
+            "Stop working or doing an activity because enough has been done.",
+          example: "Let’s call it a day and continue tomorrow.",
+          contrast: "They kept working late into the night.",
+        },
+        {
+          id: 5,
+          phrase: "UNDER THE WEATHER",
+          meaning: "Feel slightly ill or unwell and lack full energy.",
+          example: "I’m feeling under the weather today.",
+          contrast: "She felt perfectly healthy.",
+        },
+        {
+          id: 6,
+          phrase: "COST AN ARM AND A LEG",
+          meaning:
+            "Be extremely expensive and require a lot of money to afford.",
+          example: "That car costs an arm and a leg.",
+          contrast: "The repair was very cheap.",
+        },
+        {
+          id: 7,
+          phrase: "PIECE OF CAKE",
+          meaning: "Be very easy to do without much effort.",
+          example: "The test was a piece of cake.",
+          contrast: "The task was extremely difficult.",
+        },
+        {
+          id: 8,
+          phrase: "ON CLOUD NINE",
+          meaning: "Feel extremely happy due to good news or success.",
+          example: "She was on cloud nine after hearing the results.",
+          contrast: "He felt disappointed and upset.",
+        },
+        {
+          id: 9,
+          phrase: "SPILL THE BEANS",
+          meaning: "Reveal secret information accidentally or intentionally.",
+          example: "He spilled the beans about the surprise party.",
+          contrast: "She kept the secret hidden.",
+        },
+        {
+          id: 10,
+          phrase: "BITE THE BULLET",
+          meaning:
+            "Face a difficult or unpleasant situation with courage and acceptance.",
+          example: "I finally bit the bullet and paid the bill.",
+          contrast: "He avoided the problem.",
+        },
+        {
+          id: 11,
+          phrase: "ON THE SAME PAGE",
+          meaning: "Share the same understanding or agreement in a situation.",
+          example: "Let’s make sure we’re on the same page.",
+          contrast: "They misunderstood each other.",
+        },
+        {
+          id: 12,
+          phrase: "BURN THE MIDNIGHT OIL",
+          meaning: "Work late into the night to complete an important task.",
+          example: "She burned the midnight oil studying for exams.",
+          contrast: "He went to bed early.",
+        },
+        {
+          id: 13,
+          phrase: "THE BALL IS IN YOUR COURT",
+          meaning:
+            "Be responsible for taking the next action or making a decision.",
+          example: "I’ve done my part; the ball is in your court.",
+          contrast: "The responsibility stayed with him.",
+        },
+        {
+          id: 14,
+          phrase: "CUT CORNERS",
+          meaning: "Do something cheaply or carelessly to save time or money.",
+          example: "They cut corners to finish quickly.",
+          contrast: "She did the job properly.",
+        },
+        {
+          id: 15,
+          phrase: "GET COLD FEET",
+          meaning:
+            "Feel nervous and lose confidence before doing something important.",
+          example: "He got cold feet before the presentation.",
+          contrast: "She felt confident and ready.",
+        },
+        {
+          id: 16,
+          phrase: "JUMP THE GUN",
+          meaning:
+            "Act too early without waiting for the right moment or information.",
+          example: "Don’t jump the gun; wait for approval.",
+          contrast: "She waited patiently.",
+        },
+        {
+          id: 17,
+          phrase: "IN HOT WATER",
+          meaning: "Be in trouble due to mistakes or bad decisions.",
+          example: "He’s in hot water for missing the deadline.",
+          contrast: "She was praised instead.",
+        },
+        {
+          id: 18,
+          phrase: "KEEP AN EYE ON",
+          meaning: "Watch something carefully to prevent problems or mistakes.",
+          example: "Please keep an eye on the kids.",
+          contrast: "He ignored the situation.",
+        },
+        {
+          id: 19,
+          phrase: "LET THE CAT OUT OF THE BAG",
+          meaning: "Reveal a secret unintentionally before the right time.",
+          example: "She let the cat out of the bag about the plan.",
+          contrast: "The secret remained hidden.",
+        },
+        {
+          id: 20,
+          phrase: "MISS THE BOAT",
+          meaning: "Lose an opportunity by acting too late.",
+          example: "He missed the boat by applying late.",
+          contrast: "She applied early and succeeded.",
+        },
+        {
+          id: 21,
+          phrase: "ON THIN ICE",
+          meaning:
+            "Be in a risky situation where one mistake can cause trouble.",
+          example: "You’re on thin ice with your boss.",
+          contrast: "He was in a safe position.",
+        },
+        {
+          id: 22,
+          phrase: "PULL SOME STRINGS",
+          meaning: "Use personal connections to gain an advantage.",
+          example: "She pulled some strings to get the job.",
+          contrast: "He succeeded without help.",
+        },
+        {
+          id: 23,
+          phrase: "RAISE THE BAR",
+          meaning: "Increase standards or expectations to improve quality.",
+          example: "The company raised the bar this year.",
+          contrast: "Expectations were lowered.",
+        },
+        {
+          id: 24,
+          phrase: "SEE EYE TO EYE",
+          meaning: "Agree completely with someone’s opinion or view.",
+          example: "They see eye to eye on the issue.",
+          contrast: "They strongly disagreed.",
+        },
+        {
+          id: 25,
+          phrase: "TAKE WITH A GRAIN OF SALT",
+          meaning: "Not fully believe information and remain skeptical.",
+          example: "Take his story with a grain of salt.",
+          contrast: "She believed it completely.",
+        },
+        {
+          id: 26,
+          phrase: "THROW IN THE TOWEL",
+          meaning: "Give up after realizing continued effort is useless.",
+          example: "He threw in the towel after many failures.",
+          contrast: "She kept trying.",
+        },
+        {
+          id: 27,
+          phrase: "TURN A BLIND EYE",
+          meaning: "Ignore wrongdoing intentionally to avoid involvement.",
+          example: "The manager turned a blind eye to mistakes.",
+          contrast: "She addressed the problem immediately.",
+        },
+        {
+          id: 28,
+          phrase: "UP IN THE AIR",
+          meaning: "Remain uncertain without a final decision.",
+          example: "Our plans are still up in the air.",
+          contrast: "Everything was confirmed.",
+        },
+        {
+          id: 29,
+          phrase: "WRAP YOUR HEAD AROUND",
+          meaning: "Try to understand a complex or confusing idea.",
+          example: "It took time to wrap my head around it.",
+          contrast: "He understood instantly.",
+        },
+        {
+          id: 30,
+          phrase: "BACK TO THE DRAWING BOARD",
+          meaning: "Start again after a failed attempt to improve results.",
+          example: "The plan failed, so it’s back to the drawing board.",
+          contrast: "The idea worked perfectly.",
+        },
+        {
+          id: 31,
+          phrase: "GO THE EXTRA MILE",
+          meaning: "Put in additional effort to achieve better results.",
+          example: "She always goes the extra mile for clients.",
+          contrast: "He did the bare minimum.",
+        },
+        {
+          id: 32,
+          phrase: "HIT THE NAIL ON THE HEAD",
+          meaning: "Describe or identify a situation with exact accuracy.",
+          example: "You hit the nail on the head.",
+          contrast: "His explanation was wrong.",
+        },
+        {
+          id: 33,
+          phrase: "IN A NUTSHELL",
+          meaning: "Explain something briefly and clearly.",
+          example: "In a nutshell, the project was successful.",
+          contrast: "He gave a long explanation.",
+        },
+        {
+          id: 34,
+          phrase: "KEEP YOUR FINGERS CROSSED",
+          meaning: "Hope for a positive outcome in an uncertain situation.",
+          example: "Fingers crossed for good news.",
+          contrast: "He expected failure.",
+        },
+        {
+          id: 35,
+          phrase: "LAST STRAW",
+          meaning: "The final problem that causes loss of patience.",
+          example: "That was the last straw for her.",
+          contrast: "He tolerated everything.",
+        },
+        {
+          id: 36,
+          phrase: "OFF THE HOOK",
+          meaning: "Be free from blame or responsibility.",
+          example: "He’s off the hook this time.",
+          contrast: "She was punished.",
+        },
+        {
+          id: 37,
+          phrase: "ON THE FENCE",
+          meaning: "Remain undecided between two choices.",
+          example: "I’m on the fence about it.",
+          contrast: "He made a clear decision.",
+        },
+        {
+          id: 38,
+          phrase: "PLAY IT BY EAR",
+          meaning: "Decide actions as a situation develops.",
+          example: "Let’s play it by ear.",
+          contrast: "Everything was planned.",
+        },
+        {
+          id: 39,
+          phrase: "PULL YOUR WEIGHT",
+          meaning: "Do your fair share of work in a group.",
+          example: "Everyone must pull their weight.",
+          contrast: "He avoided responsibility.",
+        },
+        {
+          id: 40,
+          phrase: "READ BETWEEN THE LINES",
+          meaning: "Understand hidden or implied meanings.",
+          example: "Read between the lines of his message.",
+          contrast: "She took it literally.",
+        },
+        {
+          id: 41,
+          phrase: "SAVE FOR A RAINY DAY",
+          meaning: "Set money aside for future emergencies.",
+          example: "I save for a rainy day.",
+          contrast: "He spent everything.",
+        },
+        {
+          id: 42,
+          phrase: "STAB IN THE DARK",
+          meaning: "Make a guess without enough information.",
+          example: "It was a stab in the dark.",
+          contrast: "She knew the answer.",
+        },
+        {
+          id: 43,
+          phrase: "TAKE IT WITH A PINCH OF SALT",
+          meaning: "Doubt information and avoid believing it fully.",
+          example: "Take rumors with a pinch of salt.",
+          contrast: "He trusted them blindly.",
+        },
+        {
+          id: 44,
+          phrase: "THROW SOMEONE UNDER THE BUS",
+          meaning: "Blame someone else to protect yourself.",
+          example: "He threw his teammate under the bus.",
+          contrast: "She took responsibility.",
+        },
+        {
+          id: 45,
+          phrase: "TURN THE TABLES",
+          meaning: "Change a situation to gain advantage.",
+          example: "She turned the tables on her rival.",
+          contrast: "He stayed powerless.",
+        },
+        {
+          id: 46,
+          phrase: "UP TO YOUR NECK",
+          meaning: "Be extremely busy or overwhelmed.",
+          example: "I’m up to my neck in work.",
+          contrast: "She had free time.",
+        },
+        {
+          id: 47,
+          phrase: "WALK ON EGGSHELLS",
+          meaning: "Act carefully to avoid upsetting someone.",
+          example: "He walks on eggshells around her.",
+          contrast: "She spoke freely.",
+        },
+        {
+          id: 48,
+          phrase: "WORD OF MOUTH",
+          meaning: "Information shared verbally between people.",
+          example: "The business grew by word of mouth.",
+          contrast: "It relied on ads.",
+        },
+        {
+          id: 49,
+          phrase: "POINT OUT",
+          meaning: "Direct attention to something to clarify or correct it.",
+          example: "The teacher pointed out the mistake.",
+          contrast: "She ignored the error.",
+        },
+        {
+          id: 50,
+          phrase: "WORK AGAINST THE CLOCK",
+          meaning: "Rush to finish before time runs out.",
+          example: "We worked against the clock.",
+          contrast: "There was no deadline.",
+        },
+        {
+          id: 51,
+          phrase: "IN THE LOOP",
+          meaning:
+            "Stay informed about a situation in order to understand what is happening.",
+          example: "Keep me in the loop about the project updates.",
+          contrast: "He was out of the loop and knew nothing.",
+        },
+        {
+          id: 52,
+          phrase: "OUT OF THE LOOP",
+          meaning:
+            "Be uninformed about a situation and miss important information.",
+          example: "I felt out of the loop after missing the meeting.",
+          contrast: "She stayed informed the whole time.",
+        },
+        {
+          id: 53,
+          phrase: "PUT YOUR FOOT DOWN",
+          meaning:
+            "Make a strong and final decision in a situation to stop unwanted behavior.",
+          example: "She put her foot down and refused to change her mind.",
+          contrast: "He gave in easily.",
+        },
+        {
+          id: 54,
+          phrase: "ROCK THE BOAT",
+          meaning:
+            "Cause unnecessary trouble in a stable situation by creating conflict.",
+          example: "Don’t rock the boat by bringing up old issues.",
+          contrast: "Everything stayed calm and stable.",
+        },
+        {
+          id: 55,
+          phrase: "BLOW OFF STEAM",
+          meaning: "Release stress or anger in order to feel relaxed again.",
+          example: "He went for a walk to blow off steam.",
+          contrast: "She kept all her stress inside.",
+        },
+        {
+          id: 56,
+          phrase: "CALL THE SHOTS",
+          meaning:
+            "Control decisions in a situation to direct how things are done.",
+          example: "The manager calls the shots in this company.",
+          contrast: "He had no authority.",
+        },
+        {
+          id: 57,
+          phrase: "DROP THE BALL",
+          meaning:
+            "Make a mistake by failing to do your responsibility properly.",
+          example: "He dropped the ball on the project.",
+          contrast: "She handled everything perfectly.",
+        },
+        {
+          id: 58,
+          phrase: "GET OUT OF HAND",
+          meaning:
+            "Become uncontrollable in a situation due to lack of control.",
+          example: "The argument got out of hand quickly.",
+          contrast: "The discussion stayed calm.",
+        },
+        {
+          id: 59,
+          phrase: "GIVE SOMEONE THE BENEFIT OF THE DOUBT",
+          meaning:
+            "Choose to trust someone when you are unsure about their actions.",
+          example: "I’ll give him the benefit of the doubt this time.",
+          contrast: "She assumed the worst.",
+        },
+        {
+          id: 60,
+          phrase: "GO DOWN IN FLAMES",
+          meaning: "Fail badly and publicly in a noticeable way.",
+          example: "His plan went down in flames.",
+          contrast: "The idea succeeded smoothly.",
+        },
+        {
+          id: 61,
+          phrase: "HAVE A LOT ON YOUR PLATE",
+          meaning:
+            "Be responsible for many tasks at the same time and feel overwhelmed.",
+          example: "She has a lot on her plate this week.",
+          contrast: "He had nothing to do.",
+        },
+        {
+          id: 62,
+          phrase: "KEEP YOUR COOL",
+          meaning: "Stay calm in a stressful situation to avoid conflict.",
+          example: "He kept his cool during the argument.",
+          contrast: "She lost her temper.",
+        },
+        {
+          id: 63,
+          phrase: "LEARN THE HARD WAY",
+          meaning:
+            "Gain knowledge through difficult experiences instead of advice.",
+          example: "He learned the hard way not to ignore warnings.",
+          contrast: "She learned from others’ mistakes.",
+        },
+        {
+          id: 64,
+          phrase: "MAKE A LONG STORY SHORT",
+          meaning: "Summarize information briefly to save time.",
+          example: "Long story short, we missed the flight.",
+          contrast: "He explained every detail.",
+        },
+        {
+          id: 65,
+          phrase: "NOT WORTH THE TROUBLE",
+          meaning:
+            "Decide something is unnecessary because the effort is too much.",
+          example: "Fixing it isn’t worth the trouble.",
+          contrast: "The result was worth the effort.",
+        },
+        {
+          id: 66,
+          phrase: "ON THE RIGHT TRACK",
+          meaning: "Make progress in a situation toward the correct goal.",
+          example: "Your project is on the right track.",
+          contrast: "He was completely lost.",
+        },
+        {
+          id: 67,
+          phrase: "OUT OF THE BLUE",
+          meaning: "Happen unexpectedly without any warning.",
+          example: "She called me out of the blue.",
+          contrast: "We expected the call.",
+        },
+        {
+          id: 68,
+          phrase: "PUSH YOUR LUCK",
+          meaning:
+            "Take unnecessary risks by asking for more than is reasonable.",
+          example: "Don’t push your luck with the boss.",
+          contrast: "He knew when to stop.",
+        },
+        {
+          id: 69,
+          phrase: "READ THE ROOM",
+          meaning:
+            "Understand people’s emotions in a situation to act appropriately.",
+          example: "He failed to read the room.",
+          contrast: "She sensed the mood perfectly.",
+        },
+        {
+          id: 70,
+          phrase: "SEE THE BIG PICTURE",
+          meaning: "Focus on the overall situation instead of small details.",
+          example: "Try to see the big picture.",
+          contrast: "He focused only on minor issues.",
+        },
+        {
+          id: 71,
+          phrase: "STEP UP YOUR GAME",
+          meaning: "Improve performance in order to meet higher expectations.",
+          example: "You need to step up your game.",
+          contrast: "He stayed at the same level.",
+        },
+        {
+          id: 72,
+          phrase: "TAKE A BACK SEAT",
+          meaning: "Reduce involvement in a situation to allow others to lead.",
+          example: "He took a back seat during the discussion.",
+          contrast: "She dominated the conversation.",
+        },
+        {
+          id: 73,
+          phrase: "THAT SHIP HAS SAILED",
+          meaning: "Accept that an opportunity is gone and cannot return.",
+          example: "Forget it — that ship has sailed.",
+          contrast: "The chance was still open.",
+        },
+        {
+          id: 74,
+          phrase: "THINK OUTSIDE THE BOX",
+          meaning: "Use creative thinking to solve problems in new ways.",
+          example: "We need to think outside the box.",
+          contrast: "He followed old methods.",
+        },
+        {
+          id: 75,
+          phrase: "UNDER YOUR NOSE",
+          meaning: "Exist very close to you but remain unnoticed.",
+          example: "The answer was right under your nose.",
+          contrast: "It was hard to find.",
+        },
+        {
+          id: 76,
+          phrase: "WALK THE TALK",
+          meaning: "Support your words with real actions to prove honesty.",
+          example: "She truly walks the talk.",
+          contrast: "He only made promises.",
+        },
+        {
+          id: 77,
+          phrase: "WHEN PUSH COMES TO SHOVE",
+          meaning: "Act seriously when a situation becomes critical.",
+          example: "When push comes to shove, he delivers.",
+          contrast: "He avoided responsibility.",
+        },
+        {
+          id: 78,
+          phrase: "WIPE THE SLATE CLEAN",
+          meaning: "Forget past mistakes in order to start fresh.",
+          example: "Let’s wipe the slate clean.",
+          contrast: "She held grudges.",
+        },
+        {
+          id: 79,
+          phrase: "WRAP THINGS UP",
+          meaning: "Finish a task or activity completely.",
+          example: "Let’s wrap things up for today.",
+          contrast: "Work continued.",
+        },
+        {
+          id: 80,
+          phrase: "YOU CAN SAY THAT AGAIN",
+          meaning: "Strongly agree with someone’s statement.",
+          example: "This weather is awful — you can say that again.",
+          contrast: "He disagreed.",
+        },
+        {
+          id: 81,
+          phrase: "AT THE DROP OF A HAT",
+          meaning: "Act immediately without hesitation when needed.",
+          example: "He’ll help at the drop of a hat.",
+          contrast: "She hesitated.",
+        },
+        {
+          id: 82,
+          phrase: "BACK SOMEONE UP",
+          meaning:
+            "Support someone in a situation to strengthen their position.",
+          example: "I’ll back you up if needed.",
+          contrast: "He stood alone.",
+        },
+        {
+          id: 83,
+          phrase: "BEND OVER BACKWARDS",
+          meaning: "Make extreme efforts to help someone succeed.",
+          example: "She bent over backwards to help.",
+          contrast: "He refused to help.",
+        },
+        {
+          id: 84,
+          phrase: "BY THE BOOK",
+          meaning: "Follow rules strictly to avoid mistakes or punishment.",
+          example: "He does everything by the book.",
+          contrast: "She ignored the rules.",
+        },
+        {
+          id: 85,
+          phrase: "CUT SOMEONE SOME SLACK",
+          meaning: "Be less strict to allow for mistakes or difficulties.",
+          example: "Cut him some slack — he’s new.",
+          contrast: "She showed no mercy.",
+        },
+        {
+          id: 86,
+          phrase: "GET A TASTE OF YOUR OWN MEDICINE",
+          meaning: "Experience the same negative treatment you gave others.",
+          example: "He finally got a taste of his own medicine.",
+          contrast: "She was treated kindly.",
+        },
+        {
+          id: 87,
+          phrase: "GO OUT ON A LIMB",
+          meaning: "Take a risk by expressing an uncertain opinion.",
+          example: "I’ll go out on a limb and say yes.",
+          contrast: "He played it safe.",
+        },
+        {
+          id: 88,
+          phrase: "HAVE SECOND THOUGHTS",
+          meaning: "Begin doubting a decision after initially agreeing.",
+          example: "I’m having second thoughts about it.",
+          contrast: "She felt confident.",
+        },
+        {
+          id: 89,
+          phrase: "IN OVER YOUR HEAD",
+          meaning: "Be involved in a situation too difficult to manage.",
+          example: "He’s in over his head with this job.",
+          contrast: "She handled it easily.",
+        },
+        {
+          id: 90,
+          phrase: "KEEP SOMETHING UNDER WRAPS",
+          meaning: "Hide information to prevent others from knowing.",
+          example: "The plan was kept under wraps.",
+          contrast: "Everyone knew.",
+        },
+        {
+          id: 91,
+          phrase: "LEAVE NO STONE UNTURNED",
+          meaning: "Search thoroughly to find a solution or answer.",
+          example: "We left no stone unturned.",
+          contrast: "They barely tried.",
+        },
+        {
+          id: 92,
+          phrase: "OFF THE RECORD",
+          meaning: "Share information privately without public disclosure.",
+          example: "This is off the record.",
+          contrast: "It was publicly announced.",
+        },
+        {
+          id: 93,
+          phrase: "ONCE IN A BLUE MOON",
+          meaning: "Happen very rarely over a long period of time.",
+          example: "He visits once in a blue moon.",
+          contrast: "She visits often.",
+        },
+        {
+          id: 94,
+          phrase: "PLAY DEVIL’S ADVOCATE",
+          meaning: "Argue an opposing view to test ideas critically.",
+          example: "I’ll play devil’s advocate here.",
+          contrast: "Everyone agreed blindly.",
+        },
+        {
+          id: 95,
+          phrase: "PUT ALL YOUR EGGS IN ONE BASKET",
+          meaning: "Risk everything on one option without backup.",
+          example: "Don’t put all your eggs in one basket.",
+          contrast: "She diversified her plans.",
+        },
+        {
+          id: 96,
+          phrase: "STICK TO YOUR GUNS",
+          meaning: "Maintain your decision despite pressure to change.",
+          example: "He stuck to his guns.",
+          contrast: "She gave up.",
+        },
+        {
+          id: 97,
+          phrase: "TAKE THE HIGH ROAD",
+          meaning: "Choose moral behavior to avoid conflict.",
+          example: "She took the high road.",
+          contrast: "He reacted angrily.",
+        },
+        {
+          id: 98,
+          phrase: "THE TIP OF THE ICEBERG",
+          meaning: "Represent a small visible part of a much larger problem.",
+          example: "This issue is just the tip of the iceberg.",
+          contrast: "That was the whole problem.",
+        },
+        {
+          id: 99,
+          phrase: "LET SLEEPING DOGS LIE",
+          meaning: "Avoid reopening past conflicts to prevent new problems.",
+          example: "Don’t mention it — let sleeping dogs lie.",
+          contrast: "She brought it up again.",
+        },
+        {
+          id: 100,
+          phrase: "A BLESSING IN DISGUISE",
+          meaning:
+            "Experience something negative that later results in a positive outcome.",
+          example: "Losing that job was a blessing in disguise.",
+          contrast: "It caused permanent harm.",
+        },
+        {
+          id: 101,
+          phrase: "AHEAD OF THE CURVE",
+          meaning:
+            "Stay more advanced than others by preparing early or adopting new ideas first.",
+          example: "Companies that use AI early stay ahead of the curve.",
+          contrast: "He followed trends too late.",
+        },
+        {
+          id: 102,
+          phrase: "ALL HANDS ON DECK",
+          meaning:
+            "Require everyone’s help in a difficult or urgent situation.",
+          example: "It’s all hands on deck to meet the deadline.",
+          contrast: "Only a few people were involved.",
+        },
+        {
+          id: 103,
+          phrase: "BACK ON TRACK",
+          meaning:
+            "Return to the correct path after making mistakes or delays.",
+          example: "After fixing the issues, the project is back on track.",
+          contrast: "Progress continued to fail.",
+        },
+        {
+          id: 104,
+          phrase: "BARKING UP THE WRONG TREE",
+          meaning: "Accuse or blame the wrong person for a problem.",
+          example: "You’re barking up the wrong tree if you think it was me.",
+          contrast: "He identified the real cause.",
+        },
+        {
+          id: 105,
+          phrase: "BEAT AROUND THE BUSH",
+          meaning: "Avoid saying something directly to escape discomfort.",
+          example: "Stop beating around the bush and tell the truth.",
+          contrast: "She spoke honestly.",
+        },
+        {
+          id: 106,
+          phrase: "BITE OFF MORE THAN YOU CAN CHEW",
+          meaning: "Take on more responsibility than you can handle.",
+          example: "He bit off more than he could chew with that project.",
+          contrast: "She managed her workload well.",
+        },
+        {
+          id: 107,
+          phrase: "BREAK EVEN",
+          meaning: "Neither make a profit nor a loss after expenses.",
+          example: "The business broke even this month.",
+          contrast: "They made a large profit.",
+        },
+        {
+          id: 108,
+          phrase: "BRING HOME THE BACON",
+          meaning: "Earn money to support yourself or your family.",
+          example: "She works hard to bring home the bacon.",
+          contrast: "He depends on others.",
+        },
+        {
+          id: 109,
+          phrase: "BURN THE CANDLE AT BOTH ENDS",
+          meaning: "Exhaust yourself by overworking without rest.",
+          example: "He’s burning the candle at both ends.",
+          contrast: "She maintains a balanced schedule.",
+        },
+        {
+          id: 110,
+          phrase: "BY A LONG SHOT",
+          meaning: "By a large margin or without doubt.",
+          example: "This is the best option by a long shot.",
+          contrast: "The choice was very close.",
+        },
+        {
+          id: 111,
+          phrase: "CALL IT QUITS",
+          meaning:
+            "Stop an activity because continuing is no longer worthwhile.",
+          example: "After years of stress, he called it quits.",
+          contrast: "She kept going.",
+        },
+        {
+          id: 112,
+          phrase: "CATCH SOMEONE OFF GUARD",
+          meaning: "Surprise someone when they are unprepared.",
+          example: "The question caught him off guard.",
+          contrast: "She expected it.",
+        },
+        {
+          id: 113,
+          phrase: "COME FULL CIRCLE",
+          meaning: "Return to the original position after many changes.",
+          example: "Fashion trends often come full circle.",
+          contrast: "Things changed permanently.",
+        },
+        {
+          id: 114,
+          phrase: "CRACK THE CODE",
+          meaning: "Solve a difficult problem or understand something complex.",
+          example: "She finally cracked the code to success.",
+          contrast: "He remained confused.",
+        },
+        {
+          id: 115,
+          phrase: "CUT TO THE CHASE",
+          meaning: "Skip unnecessary details and get to the main point.",
+          example: "Let’s cut to the chase and talk money.",
+          contrast: "He talked endlessly.",
+        },
+        {
+          id: 116,
+          phrase: "DOWN TO THE WIRE",
+          meaning: "Continue until the last possible moment before a deadline.",
+          example: "The match went down to the wire.",
+          contrast: "It ended early.",
+        },
+        {
+          id: 117,
+          phrase: "DRAW THE LINE",
+          meaning: "Set a firm limit to stop unacceptable behavior.",
+          example: "She drew the line at working weekends.",
+          contrast: "He accepted everything.",
+        },
+        {
+          id: 118,
+          phrase: "EAT HUMBLE PIE",
+          meaning: "Admit you were wrong and accept embarrassment.",
+          example: "He had to eat humble pie after the mistake.",
+          contrast: "She refused to apologize.",
+        },
+        {
+          id: 119,
+          phrase: "FACE THE FACTS",
+          meaning: "Accept reality even when it is unpleasant.",
+          example: "It’s time to face the facts.",
+          contrast: "He lived in denial.",
+        },
+        {
+          id: 120,
+          phrase: "GET YOUR ACT TOGETHER",
+          meaning: "Organize yourself and improve behavior or performance.",
+          example: "You need to get your act together.",
+          contrast: "He stayed disorganized.",
+        },
+        {
+          id: 121,
+          phrase: "GIVE SOMEONE A HAND",
+          meaning: "Help someone with a task or problem.",
+          example: "Can you give me a hand with this?",
+          contrast: "She refused to help.",
+        },
+        {
+          id: 122,
+          phrase: "GO WITH THE FLOW",
+          meaning: "Accept situations calmly instead of resisting change.",
+          example: "He prefers to go with the flow.",
+          contrast: "She fought every change.",
+        },
+        {
+          id: 123,
+          phrase: "HIT THE GROUND RUNNING",
+          meaning: "Start a task with strong energy and immediate action.",
+          example: "She hit the ground running at her new job.",
+          contrast: "He started slowly.",
+        },
+        {
+          id: 124,
+          phrase: "IN THE LONG RUN",
+          meaning: "Over a long period of time, considering future results.",
+          example: "This choice will help in the long run.",
+          contrast: "It caused short-term damage.",
+        },
+        {
+          id: 125,
+          phrase: "KEEP YOUR HEAD ABOVE WATER",
+          meaning: "Survive financial or emotional difficulty without failing.",
+          example: "He’s just keeping his head above water.",
+          contrast: "She was thriving.",
+        },
+        {
+          id: 126,
+          phrase: "KNOW THE ROPES",
+          meaning: "Understand how a system or job works.",
+          example: "She knows the ropes already.",
+          contrast: "He was completely lost.",
+        },
+        {
+          id: 127,
+          phrase: "LEARN THE ROPES",
+          meaning: "Begin to understand how to do a new job or task.",
+          example: "It took weeks to learn the ropes.",
+          contrast: "She already had experience.",
+        },
+        {
+          id: 128,
+          phrase: "LET THE DUST SETTLE",
+          meaning: "Wait until a situation becomes calm before acting.",
+          example: "Let the dust settle before deciding.",
+          contrast: "He reacted immediately.",
+        },
+        {
+          id: 129,
+          phrase: "MAKE ENDS MEET",
+          meaning: "Manage finances to survive with limited money.",
+          example: "It’s hard to make ends meet these days.",
+          contrast: "She saved easily.",
+        },
+        {
+          id: 130,
+          phrase: "MISS THE MARK",
+          meaning: "Fail to achieve the intended goal.",
+          example: "The campaign missed the mark.",
+          contrast: "It succeeded perfectly.",
+        },
+        {
+          id: 131,
+          phrase: "NO STRINGS ATTACHED",
+          meaning: "Given freely without conditions or obligations.",
+          example: "The help came with no strings attached.",
+          contrast: "There were hidden demands.",
+        },
+        {
+          id: 132,
+          phrase: "OFF THE BEATEN PATH",
+          meaning: "Located away from common or popular places.",
+          example: "They chose a hotel off the beaten path.",
+          contrast: "It was a tourist hotspot.",
+        },
+        {
+          id: 133,
+          phrase: "ON THE SAME WAVELENGTH",
+          meaning: "Share similar thoughts or understanding with someone.",
+          example: "We’re on the same wavelength.",
+          contrast: "They misunderstood each other.",
+        },
+        {
+          id: 134,
+          phrase: "PLAIN SAILING",
+          meaning: "Progress easily without problems.",
+          example: "After approval, it was plain sailing.",
+          contrast: "Difficulties appeared.",
+        },
+        {
+          id: 135,
+          phrase: "PUT IN YOUR TWO CENTS",
+          meaning: "Offer an opinion even if not asked.",
+          example: "He always puts in his two cents.",
+          contrast: "She stayed silent.",
+        },
+        {
+          id: 136,
+          phrase: "RAISE A RED FLAG",
+          meaning: "Signal a warning about a potential problem.",
+          example: "His behavior raised a red flag.",
+          contrast: "Everything seemed safe.",
+        },
+        {
+          id: 137,
+          phrase: "RUN OUT OF STEAM",
+          meaning: "Lose energy or motivation to continue.",
+          example: "The team ran out of steam.",
+          contrast: "They stayed motivated.",
+        },
+        {
+          id: 138,
+          phrase: "SET THE RECORD STRAIGHT",
+          meaning: "Correct false information to reveal the truth.",
+          example: "She set the record straight.",
+          contrast: "The lie continued.",
+        },
+        {
+          id: 139,
+          phrase: "SMOOTH SAILING",
+          meaning: "Progress without difficulty or conflict.",
+          example: "After the fix, it was smooth sailing.",
+          contrast: "Problems returned.",
+        },
+        {
+          id: 140,
+          phrase: "TAKE IT OR LEAVE IT",
+          meaning: "Offer terms without room for negotiation.",
+          example: "This is my final offer — take it or leave it.",
+          contrast: "He negotiated further.",
+        },
+        {
+          id: 141,
+          phrase: "THE BALLPARK FIGURE",
+          meaning: "An approximate number rather than an exact amount.",
+          example: "Give me a ballpark figure.",
+          contrast: "She gave an exact number.",
+        },
+        {
+          id: 142,
+          phrase: "THROUGH THICK AND THIN",
+          meaning: "Stay loyal during both good and bad times.",
+          example: "They stayed together through thick and thin.",
+          contrast: "He left during trouble.",
+        },
+        {
+          id: 143,
+          phrase: "UNDER THE RADAR",
+          meaning: "Avoid attention while operating quietly.",
+          example: "The project stayed under the radar.",
+          contrast: "It attracted attention.",
+        },
+        {
+          id: 144,
+          phrase: "UP IN SMOKE",
+          meaning: "Fail completely or disappear unexpectedly.",
+          example: "All plans went up in smoke.",
+          contrast: "Everything worked out.",
+        },
+        {
+          id: 145,
+          phrase: "WALK A FINE LINE",
+          meaning: "Balance between two risky or opposing options.",
+          example: "He walks a fine line at work.",
+          contrast: "He chose one side.",
+        },
+        {
+          id: 146,
+          phrase: "WATER UNDER THE BRIDGE",
+          meaning: "Past events that no longer matter.",
+          example: "That argument is water under the bridge.",
+          contrast: "She still held a grudge.",
+        },
+        {
+          id: 147,
+          phrase: "WEIGH YOUR OPTIONS",
+          meaning: "Consider all choices carefully before deciding.",
+          example: "Take time to weigh your options.",
+          contrast: "He rushed the decision.",
+        },
+        {
+          id: 148,
+          phrase: "WHEN IT RAINS, IT POURS",
+          meaning: "Problems tend to happen all at once.",
+          example:
+            "First the car broke, then the phone — when it rains, it pours.",
+          contrast: "Problems happened separately.",
+        },
+        {
+          id: 149,
+          phrase: "WITH FLYING COLORS",
+          meaning: "Succeed with excellent results.",
+          example: "She passed the exam with flying colors.",
+          contrast: "He barely passed.",
+        },
+        {
+          id: 150,
+          phrase: "WRITTEN ALL OVER YOUR FACE",
+          meaning: "Clearly show emotions or thoughts without speaking.",
+          example: "Your excitement is written all over your face.",
+          contrast: "He hid his feelings.",
+        },
+        {
+          id: 151,
+          phrase: "ADD FUEL TO THE FIRE",
+          meaning:
+            "Make a bad or tense situation worse by saying or doing something unnecessary.",
+          example: "His comment only added fuel to the fire.",
+          contrast: "She tried to calm the situation.",
+        },
+        {
+          id: 152,
+          phrase: "AT YOUR WITS’ END",
+          meaning:
+            "Feel completely frustrated because you cannot find a solution.",
+          example: "I’m at my wits’ end with this problem.",
+          contrast: "He felt confident and relaxed.",
+        },
+        {
+          id: 153,
+          phrase: "BITE YOUR TONGUE",
+          meaning:
+            "Stop yourself from saying something that may cause trouble.",
+          example: "I bit my tongue during the meeting.",
+          contrast: "She spoke without thinking.",
+        },
+        {
+          id: 154,
+          phrase: "BLOW THINGS OUT OF PROPORTION",
+          meaning: "Make a small problem seem much bigger than it really is.",
+          example: "He blew the issue out of proportion.",
+          contrast: "She stayed realistic.",
+        },
+        {
+          id: 155,
+          phrase: "CALL IT A NIGHT",
+          meaning: "Decide to stop an activity and rest for the day.",
+          example: "Let’s call it a night and continue tomorrow.",
+          contrast: "They stayed up working.",
+        },
+        {
+          id: 156,
+          phrase: "COME TO TERMS WITH",
+          meaning: "Accept a difficult situation emotionally over time.",
+          example: "She came to terms with the loss.",
+          contrast: "He refused to accept reality.",
+        },
+        {
+          id: 157,
+          phrase: "CROSS THAT BRIDGE WHEN YOU COME TO IT",
+          meaning: "Deal with a problem only when it actually happens.",
+          example:
+            "Don’t worry now — we’ll cross that bridge when we come to it.",
+          contrast: "She worried far too early.",
+        },
+        {
+          id: 158,
+          phrase: "CUT TO THE BONE",
+          meaning: "Reduce something to the absolute minimum needed.",
+          example: "The budget was cut to the bone.",
+          contrast: "Spending remained high.",
+        },
+        {
+          id: 159,
+          phrase: "DRAW A BLANK",
+          meaning: "Fail to remember or find an answer.",
+          example: "I drew a blank during the test.",
+          contrast: "She remembered everything.",
+        },
+        {
+          id: 160,
+          phrase: "GET THE BALL ROLLING",
+          meaning: "Start a process or activity so progress can begin.",
+          example: "Let’s get the ball rolling on this project.",
+          contrast: "Nothing was started.",
+        },
+        {
+          id: 161,
+          phrase: "GIVE IT A SHOT",
+          meaning: "Try something new even if success is uncertain.",
+          example: "I’ll give it a shot.",
+          contrast: "He refused to try.",
+        },
+        {
+          id: 162,
+          phrase: "GO BACK TO SQUARE ONE",
+          meaning: "Restart from the beginning after a failure.",
+          example: "The plan failed, so we’re back to square one.",
+          contrast: "The solution worked.",
+        },
+        {
+          id: 163,
+          phrase: "HIT A DEAD END",
+          meaning: "Reach a point where no further progress is possible.",
+          example: "The investigation hit a dead end.",
+          contrast: "They found a solution.",
+        },
+        {
+          id: 164,
+          phrase: "IN THE SAME BOAT",
+          meaning: "Share the same difficult situation as others.",
+          example: "We’re all in the same boat.",
+          contrast: "He faced no problems.",
+        },
+        {
+          id: 165,
+          phrase: "KEEP SOMETHING AT BAY",
+          meaning: "Prevent a problem from getting worse or closer.",
+          example: "Medication kept the pain at bay.",
+          contrast: "The problem grew worse.",
+        },
+        {
+          id: 166,
+          phrase: "KILL TWO BIRDS WITH ONE STONE",
+          meaning: "Achieve two goals with one action.",
+          example: "Walking to work kills two birds with one stone.",
+          contrast: "He wasted time.",
+        },
+        {
+          id: 167,
+          phrase: "LET IT SLIDE",
+          meaning: "Ignore a mistake without punishment.",
+          example: "I’ll let it slide this time.",
+          contrast: "She punished him immediately.",
+        },
+        {
+          id: 168,
+          phrase: "MAKE A MOUNTAIN OUT OF A MOLEHILL",
+          meaning: "Overreact to a small issue unnecessarily.",
+          example: "He made a mountain out of a molehill.",
+          contrast: "She stayed calm.",
+        },
+        {
+          id: 169,
+          phrase: "NO PAIN, NO GAIN",
+          meaning: "Accept difficulty as necessary for success.",
+          example: "Training is hard, but no pain, no gain.",
+          contrast: "He quit easily.",
+        },
+        {
+          id: 170,
+          phrase: "ON THE SAME BOAT",
+          meaning: "Face the same challenges as others.",
+          example: "We’re on the same boat financially.",
+          contrast: "She was unaffected.",
+        },
+        {
+          id: 171,
+          phrase: "PUT YOUR CARDS ON THE TABLE",
+          meaning: "Be honest and reveal your true intentions.",
+          example: "It’s time to put your cards on the table.",
+          contrast: "He hid the truth.",
+        },
+        {
+          id: 172,
+          phrase: "READ THE SIGNS",
+          meaning: "Understand clues that indicate what will happen next.",
+          example: "He failed to read the signs.",
+          contrast: "She anticipated the outcome.",
+        },
+        {
+          id: 173,
+          phrase: "RUN INTO TROUBLE",
+          meaning: "Encounter unexpected problems.",
+          example: "We ran into trouble during the trip.",
+          contrast: "Everything went smoothly.",
+        },
+        {
+          id: 174,
+          phrase: "SEE HOW THINGS GO",
+          meaning: "Wait and observe before making a decision.",
+          example: "Let’s see how things go.",
+          contrast: "He decided immediately.",
+        },
+        {
+          id: 175,
+          phrase: "SET THINGS IN MOTION",
+          meaning: "Start actions that lead to progress.",
+          example: "The decision set things in motion.",
+          contrast: "Nothing changed.",
+        },
+        {
+          id: 176,
+          phrase: "STAY ON YOUR TOES",
+          meaning: "Remain alert to react quickly to changes.",
+          example: "This job keeps you on your toes.",
+          contrast: "He became careless.",
+        },
+        {
+          id: 177,
+          phrase: "TAKE A STEP BACK",
+          meaning: "Pause to gain perspective before acting.",
+          example: "Let’s take a step back and think.",
+          contrast: "He rushed forward.",
+        },
+        {
+          id: 178,
+          phrase: "TAKE MATTERS INTO YOUR OWN HANDS",
+          meaning: "Act independently instead of waiting for others.",
+          example: "She took matters into her own hands.",
+          contrast: "He waited passively.",
+        },
+        {
+          id: 179,
+          phrase: "THINK AHEAD",
+          meaning: "Plan for the future to avoid problems.",
+          example: "You should think ahead financially.",
+          contrast: "He acted without planning.",
+        },
+        {
+          id: 180,
+          phrase: "THROW COLD WATER ON",
+          meaning: "Discourage enthusiasm or excitement.",
+          example: "His comment threw cold water on the idea.",
+          contrast: "She encouraged it.",
+        },
+        {
+          id: 181,
+          phrase: "TURN A CORNER",
+          meaning: "Begin to improve after a difficult period.",
+          example: "The business has turned a corner.",
+          contrast: "Things kept getting worse.",
+        },
+        {
+          id: 182,
+          phrase: "UNDER PRESSURE",
+          meaning: "Experience stress due to demands or deadlines.",
+          example: "He performs well under pressure.",
+          contrast: "She relaxed easily.",
+        },
+        {
+          id: 183,
+          phrase: "WALK AWAY FROM",
+          meaning: "Decide to leave a situation for personal benefit.",
+          example: "He walked away from the deal.",
+          contrast: "She stayed involved.",
+        },
+        {
+          id: 184,
+          phrase: "WATCH YOUR STEP",
+          meaning: "Behave carefully to avoid mistakes or trouble.",
+          example: "Watch your step around the boss.",
+          contrast: "He acted recklessly.",
+        },
+        {
+          id: 185,
+          phrase: "WEAR MANY HATS",
+          meaning: "Handle multiple roles or responsibilities.",
+          example: "She wears many hats at work.",
+          contrast: "He had one role.",
+        },
+        {
+          id: 186,
+          phrase: "WHEN ALL IS SAID AND DONE",
+          meaning: "Consider the final result after everything finishes.",
+          example: "When all is said and done, it was worth it.",
+          contrast: "The outcome was unclear.",
+        },
+        {
+          id: 187,
+          phrase: "WORK YOUR WAY UP",
+          meaning: "Progress gradually through effort and experience.",
+          example: "He worked his way up the company.",
+          contrast: "She quit early.",
+        },
+        {
+          id: 188,
+          phrase: "ZERO IN ON",
+          meaning: "Focus attention precisely on one thing.",
+          example: "Let’s zero in on the main issue.",
+          contrast: "He was distracted.",
+        },
+        {
+          id: 189,
+          phrase: "ALL TALK, NO ACTION",
+          meaning: "Make promises without taking real steps.",
+          example: "He’s all talk, no action.",
+          contrast: "She delivers results.",
+        },
+        {
+          id: 190,
+          phrase: "AT A CROSSROADS",
+          meaning: "Face an important decision that affects the future.",
+          example: "He’s at a crossroads in his career.",
+          contrast: "The path was clear.",
+        },
+        {
+          id: 191,
+          phrase: "BEAT THE ODDS",
+          meaning: "Succeed despite very low chances.",
+          example: "She beat the odds and recovered.",
+          contrast: "Failure was expected.",
+        },
+        {
+          id: 192,
+          phrase: "BURN BRIDGES",
+          meaning: "Destroy relationships permanently.",
+          example: "He burned bridges with his boss.",
+          contrast: "She kept connections.",
+        },
+        {
+          id: 193,
+          phrase: "COME CLEAN",
+          meaning: "Admit the truth after hiding it.",
+          example: "He finally came clean.",
+          contrast: "She continued lying.",
+        },
+        {
+          id: 194,
+          phrase: "GET BACK ON YOUR FEET",
+          meaning: "Recover after financial or emotional difficulty.",
+          example: "It took time to get back on your feet.",
+          contrast: "He remained defeated.",
+        },
+      ];
+
+      // --- STATE MANAGEMENT ---
+      let state = {
+        currentTab: "dashboard",
+        studyIndex: 0,
+        studyDeck: [...idiomsData],
+        quizScore: { correct: 0, total: 0 },
+        quizCurrent: null,
+        studiedCards: new Set(),
+        quizStreak: 0,
+      };
+
+      // --- INITIALIZATION ---
+      document.addEventListener("DOMContentLoaded", () => {
+        loadRandomHero();
+        renderDictionary();
+        renderCorpusChart();
+        renderQuizChart();
+        loadFlashcard(0);
+        updateStats();
+      });
+
+      // --- NAVIGATION ---
+      function switchTab(tabId) {
+        // Hide all sections
+        document.querySelectorAll("main > section").forEach((el) => {
+          el.classList.add("hidden");
+        });
+
+        // Remove active class from nav buttons
+        document.querySelectorAll(".nav-btn").forEach((btn) => {
+          btn.classList.remove(
+            "text-gray-900",
+            "border-b-2",
+            "border-[#D69E2E]"
+          );
+          btn.classList.add("text-gray-500");
+        });
+
+        // Show selected section
+        document.getElementById(tabId).classList.remove("hidden");
+        document.getElementById(tabId).classList.add("animate-fade-in");
+
+        // Add active class to selected nav button
+        const activeBtn = document.getElementById(`btn-${tabId}`);
+        if (activeBtn) {
+          activeBtn.classList.remove("text-gray-500");
+          activeBtn.classList.add(
+            "text-gray-900",
+            "border-b-2",
+            "border-[#D69E2E]"
+          );
+        }
+
+        state.currentTab = tabId;
+
+        // Initialize specific tab logic if needed
+        if (tabId === "quiz" && !state.quizCurrent) {
+          generateQuiz();
+        }
+      }
+
+      function toggleMobileMenu() {
+        const menu = document.getElementById("mobile-menu");
+        menu.classList.toggle("hidden");
+      }
+
+      // --- DASHBOARD FUNCTIONS ---
+      function loadRandomHero() {
+        const random =
+          idiomsData[Math.floor(Math.random() * idiomsData.length)];
+        document.getElementById("hero-idiom").textContent = random.phrase;
+        document.getElementById("hero-meaning").textContent = random.meaning;
+        document.getElementById("hero-example").textContent = random.example;
+      }
+
+      function updateStats() {
+        document.getElementById("stat-total").innerText = idiomsData.length;
+        document.getElementById("stat-studied").innerText =
+          state.studiedCards.size;
+        document.getElementById("stat-correct").innerText =
+          state.quizScore.correct;
+
+        const percentage =
+          state.quizScore.total === 0
+            ? 0
+            : Math.round(
+                (state.quizScore.correct / state.quizScore.total) * 100
+              );
+        document.getElementById("stat-avg").innerText = `${percentage}%`;
+      }
+
+      function renderCorpusChart() {
+        // Process data: Extract first word of every idiom
+        const startingWords = {};
+        idiomsData.forEach((item) => {
+          const firstWord = item.phrase.split(" ")[0].toUpperCase();
+          startingWords[firstWord] = (startingWords[firstWord] || 0) + 1;
+        });
+
+        // Sort and take top 8
+        const sortedWords = Object.entries(startingWords)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 8);
+
+        const ctx = document.getElementById("corpusChart").getContext("2d");
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: sortedWords.map((i) => i[0]),
+            datasets: [
+              {
+                label: "Frequency",
+                data: sortedWords.map((i) => i[1]),
+                backgroundColor: "#68D391",
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              y: { beginAtZero: true },
+            },
+          },
+        });
+      }
+
+      // --- DICTIONARY FUNCTIONS ---
+      function renderDictionary(filter = "") {
+        const tbody = document.getElementById("dictionaryBody");
+        tbody.innerHTML = "";
+        const term = filter.toLowerCase();
+
+        const filteredData = idiomsData.filter(
+          (item) =>
+            item.phrase.toLowerCase().includes(term) ||
+            item.meaning.toLowerCase().includes(term)
+        );
+
+        if (filteredData.length === 0) {
+          document.getElementById("noResults").classList.remove("hidden");
+          return;
+        }
+        document.getElementById("noResults").classList.add("hidden");
+
+        filteredData.forEach((item) => {
+          const row = `
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${item.phrase}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${item.meaning}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 italic">
+                            "${item.example}"
+                            <br><span class="text-xs not-italic text-gray-400 mt-1 block">Contrast: ${item.contrast}</span>
+                        </td>
+                    </tr>
+                `;
+          tbody.innerHTML += row;
+        });
+      }
+
+      function filterDictionary() {
+        const input = document.getElementById("searchInput");
+        renderDictionary(input.value);
+      }
+
+      // --- STUDY DECK FUNCTIONS ---
+      function loadFlashcard(index) {
+        const card = state.studyDeck[index];
+        document.getElementById("card-front-text").textContent = card.phrase;
+        document.getElementById("card-back-meaning").textContent = card.meaning;
+        document.getElementById("card-back-example").textContent = card.example;
+
+        // Reset Flip
+        document
+          .getElementById("flashcard-inner")
+          .classList.remove("rotate-y-180");
+
+        // Update counter
+        document.getElementById("card-counter").textContent = index + 1;
+
+        // Track studied
+        if (!state.studiedCards.has(card.id)) {
+          state.studiedCards.add(card.id);
+          updateStats();
+        }
+      }
+
+      function flipCard() {
+        const card = document.getElementById("flashcard-inner");
+        card.classList.toggle("rotate-y-180");
+      }
+
+      function nextCard() {
+        if (state.studyIndex < state.studyDeck.length - 1) {
+          state.studyIndex++;
+          loadFlashcard(state.studyIndex);
+        } else {
+          state.studyIndex = 0; // Loop
+          loadFlashcard(state.studyIndex);
+        }
+      }
+
+      function prevCard() {
+        if (state.studyIndex > 0) {
+          state.studyIndex--;
+          loadFlashcard(state.studyIndex);
+        } else {
+          state.studyIndex = state.studyDeck.length - 1;
+          loadFlashcard(state.studyIndex);
+        }
+      }
+
+      function shuffleDeck() {
+        for (let i = state.studyDeck.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [state.studyDeck[i], state.studyDeck[j]] = [
+            state.studyDeck[j],
+            state.studyDeck[i],
+          ];
+        }
+        state.studyIndex = 0;
+        loadFlashcard(0);
+      }
+
+      // --- QUIZ FUNCTIONS ---
+      let quizChartInstance = null;
+
+      function renderQuizChart() {
+        const ctx = document.getElementById("quizChart").getContext("2d");
+        quizChartInstance = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: ["Correct", "Incorrect"],
+            datasets: [
+              {
+                data: [0, 0],
+                backgroundColor: ["#68D391", "#FC8181"],
+                borderWidth: 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: "bottom" },
+            },
+          },
+        });
+      }
+
+      function updateQuizChart() {
+        if (quizChartInstance) {
+          const incorrect = state.quizScore.total - state.quizScore.correct;
+          quizChartInstance.data.datasets[0].data = [
+            state.quizScore.correct,
+            incorrect,
+          ];
+
+          // If no data, show a grey ring
+          if (state.quizScore.total === 0) {
+            quizChartInstance.data.datasets[0].backgroundColor = [
+              "#E2E8F0",
+              "#E2E8F0",
+            ];
+          } else {
+            quizChartInstance.data.datasets[0].backgroundColor = [
+              "#68D391",
+              "#FC8181",
+            ];
+          }
+
+          quizChartInstance.update();
+        }
+      }
+
+      function generateQuiz() {
+        // Reset UI
+        document.getElementById("quiz-feedback").classList.add("hidden");
+        document.getElementById("quiz-feedback").className =
+          "hidden mt-4 p-4 rounded-lg text-center font-bold"; // Reset classes
+        document.getElementById("btn-next-q").disabled = true;
+        document.getElementById("quiz-options").innerHTML = "";
+
+        // Pick correct answer
+        const correctIndex = Math.floor(Math.random() * idiomsData.length);
+        const correctData = idiomsData[correctIndex];
+        state.quizCurrent = correctData;
+
+        // Pick 3 detractors
+        let detractors = [];
+        while (detractors.length < 3) {
+          const dIndex = Math.floor(Math.random() * idiomsData.length);
+          if (
+            dIndex !== correctIndex &&
+            !detractors.includes(idiomsData[dIndex])
+          ) {
+            detractors.push(idiomsData[dIndex]);
+          }
+        }
+
+        // Shuffle options
+        let options = [correctData, ...detractors];
+        options.sort(() => Math.random() - 0.5);
+
+        // Render
+        document.getElementById("quiz-question").textContent =
+          correctData.meaning;
+
+        // Hint logic
+        const hintEl = document.getElementById("quiz-hint");
+        hintEl.textContent = `Hint: Starts with '${correctData.phrase.charAt(
+          0
+        )}'`;
+        hintEl.classList.remove("hidden");
+
+        const optionsContainer = document.getElementById("quiz-options");
+        options.forEach((opt) => {
+          const btn = document.createElement("button");
+          btn.className =
+            "w-full text-left p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors font-semibold text-gray-700";
+          btn.textContent = opt.phrase;
+          btn.onclick = () => handleQuizAnswer(opt.id, btn);
+          optionsContainer.appendChild(btn);
+        });
+      }
+
+      function handleQuizAnswer(selectedId, btnElement) {
+        // Disable all buttons
+        const buttons = document.getElementById("quiz-options").children;
+        for (let btn of buttons) {
+          btn.disabled = true;
+        }
+
+        const feedback = document.getElementById("quiz-feedback");
+        feedback.classList.remove("hidden");
+
+        if (selectedId === state.quizCurrent.id) {
+          // Correct
+          btnElement.classList.remove("hover:bg-gray-50", "border-gray-200");
+          btnElement.classList.add(
+            "bg-green-100",
+            "border-green-500",
+            "text-green-800"
+          );
+          feedback.textContent = "Correct! Well done.";
+          feedback.classList.add("bg-green-100", "text-green-800");
+
+          state.quizScore.correct++;
+          state.quizStreak++;
+        } else {
+          // Incorrect
+          btnElement.classList.remove("hover:bg-gray-50", "border-gray-200");
+          btnElement.classList.add(
+            "bg-red-100",
+            "border-red-500",
+            "text-red-800"
+          );
+          feedback.textContent = `Incorrect. The answer was "${state.quizCurrent.phrase}".`;
+          feedback.classList.add("bg-red-100", "text-red-800");
+
+          // Highlight correct one
+          for (let btn of buttons) {
+            if (btn.textContent === state.quizCurrent.phrase) {
+              btn.classList.add("bg-green-50", "border-green-300");
+            }
+          }
+          state.quizStreak = 0;
+        }
+
+        state.quizScore.total++;
+
+        document.getElementById(
+          "quiz-streak"
+        ).textContent = `Streak: ${state.quizStreak}`;
+        document.getElementById("btn-next-q").disabled = false;
+
+        updateStats();
+        updateQuizChart();
+      }
+
+      function nextQuestion() {
+        generateQuiz();
+      }
+    </script>
+  </body>
+</html>
